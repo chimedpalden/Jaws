@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "menu_card#index"
   root "home#index"
-  get '*path', to: 'home#index'
+  
   resources :menu_card, only: %i[index create]
+  get '*path', to: 'home#index'
 end
