@@ -44,6 +44,7 @@ gem "bootsnap", require: false
 gem "webpacker"
 gem "responders"
 gem 'react-rails'
+gem 'bcrypt', '~> 3.1.13'
 
 
 # Use Sass to process CSS

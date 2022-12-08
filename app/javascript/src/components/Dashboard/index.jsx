@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import menuApi from "apis/menu";
+import orderApi from "apis/order";
 
 const Dashboard = () => {
   const [menu, setMenu] = useState([]);
@@ -8,9 +9,10 @@ const Dashboard = () => {
   const fetchMenu = async () => {
     try {
       const {
-        data: { menu },
+        data: { products },
       } = await menuApi.list();
-      setMenu(menu);
+      setMenu(products);
+      console.log(products)
       setLoading(false);
     } catch (error) {
       logger.error(error);
@@ -22,14 +24,6 @@ const Dashboard = () => {
     fetchMenu();
   }, []);
 
-  const MenuList = () => (
-    <ul>
-      {menu.map(item => {
-        return <li key={item.id}>{item.name}</li>
-      })}
-    </ul>
-  );
-
   if (loading) {
     return (
       <div className="w-screen h-screen">
@@ -38,10 +32,53 @@ const Dashboard = () => {
     );
   }
 
+  const handleSubmit = async event => {
+    // debugger
+    // console.log(discount_item_id)
+    event.preventDefault();
+    setLoading(true);
+    try {
+      await orderApi.create({  });
+      setLoading(false);
+      history.push("/dashboard");
+    } catch (error) {
+      logger.error(error);
+      setLoading(false);
+    }
+  };
+
+  const handleClick = e => {
+    console.log("helo")
+  };
+
   return (
-    <div>
-      <h1>Dashboard here</h1>
-      <MenuList />
+    <div class="container mx-auto px-4 pt-8">   
+      <div class="grid grid-cols-4 gap-4">
+        {menu.map(item => {
+          return (
+            // <div key={item.id}>{item.name}</div>
+            <div class="max-w-sm rounded overflow-hidden shadow-lg">
+              <div class="px-6 py-4">
+                <div class="font-bold text-xl mb-2">{item.name}</div>
+                <p class="text-gray-700 text-base">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
+                </p>
+              </div>
+              <div class="px-6 pt-4 pb-2">
+                <button
+                  type="submit"
+                  onClick={handleClick}
+                  disabled={loading}
+                  className={"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"}
+                >
+                  Buy
+                </button>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      
     </div>
   );
 

@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const list = () => axios.get("/menu_card");
+const list = () => axios.get("/products");
 
 const create = payload =>
-  axios.post("/menu_card", {
-    menu_card: payload,
+  axios.post("/products", {
+    product: payload,
   });
 
 const menuApi = {

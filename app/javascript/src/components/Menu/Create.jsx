@@ -18,9 +18,9 @@ const Create = ({ history }) => {
   const fetchMenu = async () => {
     try {
       const {
-        data: { menu },
+        data: { products },
       } = await menuApi.list();
-      setMenu(menu);
+      setMenu(products);
       setLoading(false);
     } catch (error) {
       logger.error(error);
@@ -36,7 +36,7 @@ const Create = ({ history }) => {
     try {
       await menuApi.create({ name, price, tax_rate, deals_attributes: [{discounted_menu_item_id: discount_item_id, discount_percentage}] });
       setLoading(false);
-      history.push("/dashboard");
+      history.push("/");
     } catch (error) {
       logger.error(error);
       setLoading(false);
