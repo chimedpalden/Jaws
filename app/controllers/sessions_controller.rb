@@ -2,6 +2,7 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate_user_using_x_auth_token, only: :create
 
   def create
+    # binding.break
     @user = User.find_by!(email: login_params[:email].downcase)
     unless @user.authenticate(login_params[:password])
       # render status: :ok, json: { users: users }

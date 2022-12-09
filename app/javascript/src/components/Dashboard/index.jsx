@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import menuApi from "apis/menu";
 import orderApi from "apis/order";
+import { AddToCart } from "components/Cart/Add"
 
 const Dashboard = () => {
   const [menu, setMenu] = useState([]);
@@ -65,14 +66,7 @@ const Dashboard = () => {
                 </p>
               </div>
               <div class="px-6 pt-4 pb-2">
-                <button
-                  type="submit"
-                  onClick={handleClick}
-                  disabled={loading}
-                  className={"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4"}
-                >
-                  Buy
-                </button>
+                <AddToCart item={item} />
               </div>
             </div>
           )

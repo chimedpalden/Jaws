@@ -5,25 +5,37 @@ class OrdersController < ApplicationController
   #  render status: :ok, json: { orders: orders }
   # end
 
-  def new
-    product = Product.find(order_params[:product_id])
-
-    order = Order.create(user_id: order_params[:user_id] )
-    order_items = OrderItem.create(order_id: order.id, product_id: order_params[:product_id])
-    user = User.find(order_params[:user_id])
-    user.update(current_order: order.id )
-    order_items = order.order_items
-  end
-
   def create
-    order = Order.new(order_params)
-    order.save!
+    ActiveRecord::Base.transaction do
+      order = current_user.orders.new(order_params)
+      order_item_params[:order_items].each do |item|
+        order.order_items.build(item)
+      end
+      order.save!
+    end
     render status: :ok, json: { notice: 'Order was successfully created' }
   end
 
   private
 
     def order_params
-      params.require(:order, :product_id, :user_id)
+      params.require(:order).permit(:status)
+    end
+
+    def order_item_params
+      params.require(:order).permit(:status, order_items: [:product_id, :quantity])
     end
 end
+
+# {
+#   order: {
+#     order_item: [{
+#       product_id: 1,
+#       quantity: 3
+#     }, {
+#       product_id: 3,
+#       quantity: 2
+#     }]
+#   },
+#   user_id: 1
+# }
