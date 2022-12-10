@@ -20,6 +20,7 @@ const Login = () => {
         email: email.toLowerCase(),
         userId: response.data.id,
         userName: response.data.username,
+        currentOrder: response.data.current_order,
       });
       setAuthHeaders();
       setLoading(false);

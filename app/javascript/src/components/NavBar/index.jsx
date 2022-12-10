@@ -17,6 +17,7 @@ const NavBar = () => {
         email: null,
         userId: null,
         userName: null,
+        currentOrder: null,
       });
       resetAuthTokens();
       window.location.href = "/";

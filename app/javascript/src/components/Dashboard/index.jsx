@@ -33,40 +33,21 @@ const Dashboard = () => {
     );
   }
 
-  const handleSubmit = async event => {
-    // debugger
-    // console.log(discount_item_id)
-    event.preventDefault();
-    setLoading(true);
-    try {
-      await orderApi.create({  });
-      setLoading(false);
-      history.push("/dashboard");
-    } catch (error) {
-      logger.error(error);
-      setLoading(false);
-    }
-  };
-
-  const handleClick = e => {
-    console.log("helo")
-  };
-
   return (
     <div class="container mx-auto px-4 pt-8">   
       <div class="grid grid-cols-4 gap-4">
-        {menu.map(item => {
+        {menu.map(product => {
           return (
-            // <div key={item.id}>{item.name}</div>
+            // <div key={product.id}>{product.name}</div>
             <div class="max-w-sm rounded overflow-hidden shadow-lg">
               <div class="px-6 py-4">
-                <div class="font-bold text-xl mb-2">{item.name}</div>
+                <div class="font-bold text-xl mb-2">{product.name}</div>
                 <p class="text-gray-700 text-base">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
                 </p>
               </div>
               <div class="px-6 pt-4 pb-2">
-                <AddToCart item={item} />
+                <AddToCart product={product} />
               </div>
             </div>
           )

@@ -6,14 +6,26 @@ class OrdersController < ApplicationController
   # end
 
   def create
+    # binding.break
+      
     ActiveRecord::Base.transaction do
-      order = current_user.orders.new(order_params)
-      order_item_params[:order_items].each do |item|
-        order.order_items.build(item)
+      if current_user.current_order.nil? 
+        @order = current_user.orders.create!(order_params)
+        current_user.update_attribute(:current_order, order.id)
+      else
+        @order = Order.find(current_user.current_order)
       end
-      order.save!
+      order_item_params[:order_items].each do |item|
+        old_item = @order.order_items.where(product_id: item[:product_id], order_id: current_user.current_order)
+        if old_item.present?
+          old_item[0].update_attribute(:quantity, item[:quantity])
+        else
+          @order.order_items.build(item)
+        end
+      end
+      @order.save!
     end
-    render status: :ok, json: { notice: 'Order was successfully created' }
+    # render status: :ok, json: { notice: 'Order was successfully created' }
   end
 
   private
@@ -36,6 +48,5 @@ end
 #       product_id: 3,
 #       quantity: 2
 #     }]
-#   },
-#   user_id: 1
+#   }
 # }

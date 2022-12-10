@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   resources :menu_card, only: %i[index create]
   resources :products, only: %i[index create]
   resources :orders, only: :create
+  resources :order_items, only: :show
   resources :users, only: %i[index create]
   resource :session, only: [:create, :destroy]
   # end

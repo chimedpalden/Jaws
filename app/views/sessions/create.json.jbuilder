@@ -1,4 +1,5 @@
 json.extract! @user,
   :id,
   :username,
-  :authentication_token
+  :authentication_token,
+  :current_order

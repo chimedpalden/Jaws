@@ -5,7 +5,11 @@ const create = payload =>
     order: payload,
   });
 
+const show = id =>
+  axios.get(`/order_items/${id}`);
+
 const orderApi = {
+  show,
   create,
 };
 
