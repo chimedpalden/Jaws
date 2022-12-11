@@ -1,13 +1,9 @@
 class OrdersController < ApplicationController
-
-  # def index
-  #  orders = Order.all
-  #  render status: :ok, json: { orders: orders }
-  # end
+  include Billing
 
   def create
     # binding.break
-      
+
     ActiveRecord::Base.transaction do
       if current_user.current_order.nil? 
         @order = current_user.orders.create!(order_params)
@@ -25,7 +21,12 @@ class OrdersController < ApplicationController
       end
       @order.save!
     end
-    # render status: :ok, json: { notice: 'Order was successfully created' }
+  end
+
+  def show
+    order = Order.find(params[:id])
+    @cart_items = calculate_total_bill(params[:id])
+    # binding.break
   end
 
   private

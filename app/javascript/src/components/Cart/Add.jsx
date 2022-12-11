@@ -1,18 +1,41 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-// import { CartProvider, useCart } from "react-use-cart";
 import orderApi from "apis/order";
 import { getFromLocalStorage, setToLocalStorage } from "utils/storage";
 
 const Page = ({ product }) => {
-  // const { addItem, inCart, setCartMetadata } = useCart();
-  // const alreadyAdded = inCart(product.id);
   const [loading, setLoading] = useState(false);
-  // const [orderId, setOrderId] = useState(null);
   const currentOrder = getFromLocalStorage("currentOrder");
-  // const authToken = getFromLocalStorage("authToken");
   const [quantity, setQuantity] = useState(1);
   const [bill, setBill] = useState(product.price);
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  useEffect(() => {
+    setBill(quantity * product.price)
+  }, [quantity]);
+
+  const fetchCart = async () => {
+    // console.log(currentOrder)
+    if (currentOrder) {
+      try {
+        // const response = await orderApi.show(product.id);
+        const {
+          data: { quantity, product_id },
+        } = await orderApi.show(product.id);
+        console.log(quantity)
+
+        setQuantity(quantity);
+        setLoading(false);
+      } catch (error) {
+        console.log(error)
+        logger.error(error);
+        setLoading(false);
+      }
+    }
+  }
 
   const handleClick = async product => {
     setLoading(true);
@@ -37,7 +60,6 @@ const Page = ({ product }) => {
   };
 
   const Buy = () => {
-    // console.log(alreadyAdded)
     return (
       <button
         type="submit"
@@ -48,34 +70,6 @@ const Page = ({ product }) => {
       {loading ? "loading..." : "Add to cart"}
       </button>
     )
-  }
-
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  useEffect(() => {
-    setBill(quantity * product.price)
-  }, [quantity]);
-
-  const fetchCart = async () => {
-    console.log(currentOrder)
-    if (currentOrder) {
-      try {
-        const response = await orderApi.show(product.id);
-        const {
-          data: { quantity, product_id },
-        } = await orderApi.show(product.id);
-        console.log(quantity)
-
-        setQuantity(quantity);
-        setLoading(false);
-      } catch (error) {
-        console.log(error)
-        logger.error(error);
-        setLoading(false);
-      }
-    }
   }
 
   const subQuantity = () => {
@@ -122,14 +116,6 @@ const AddToCart = ({ product }) => {
   return (
     <>
       <Page product = {product} />
-      {/*<CartProvider
-        id="jamie"
-        onItemAdd={(product) => console.log(`Item ${product.id} added!`)}
-        onItemUpdate={(product) => console.log(`Item ${product.id} updated.!`)}
-        onItemRemove={() => console.log(`Item removed!`)}
-      >
-        
-      </CartProvider>*/}
     </>
   );
 }
