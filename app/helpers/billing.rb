@@ -25,6 +25,7 @@ module Billing
   def post_discount_total(order_items, order)
     deals_map = product_deals_map(order_items, order)
     # binding.break
+    # binding.break
     # {34=>
     #   [{:order_item_id=>34, :quantity=>2, :name=>"item2", :price=>345, :tax_rate=>54.0, :discount_percentage=>50},
     #    {:order_item_id=>35, :quantity=>2, :name=>"sandwitch", :price=>30, :tax_rate=>10.0, :discount_percentage=>34}],
@@ -42,15 +43,17 @@ module Billing
       order_item = order_items.select { |item| item.id == key }[0]
       price_map_per_item.push(price_per_item(order_item))
       flag[key] = 1
+      # binding.break
 
       #calculate values items
       value.each do |x|
-        next if flag[x[:order_item_id]] == 1 && key != x[:order_item_id]
+        # binding.break
+        next if flag[x[:order_item_id]] == 1
         discounted_quantity = (x[:quantity] > order_item.quantity) ? order_item.quantity : x[:quantity]
         non_discounted_quantity = (x[:quantity] > order_item.quantity) ? (x[:quantity] - order_item.quantity) : 0
 
         discount_price = (discounted_quantity * x[:price]) * (100 - x[:discount_percentage])/100
-        non_discount_price = (non_discounted_quantity * x[:price]) * (100 - x[:discount_percentage])/100
+        non_discount_price = (non_discounted_quantity * x[:price])
         total_price = discount_price + non_discount_price
 
         data = { order_item_id: x[:order_item_id], total_price_after_discount_before_tax: total_price, total_actual_price_before_tax: (x[:quantity] * x[:price]), tax_rate: x[:tax_rate], name: x[:name], quantity: x[:quantity] }
@@ -72,7 +75,7 @@ module Billing
     price = item.product.price
     tax = item.product.tax_rate
 
-    { order_item_id: item.id, total_price_after_discount_before_tax: price, total_actual_price_before_tax: price, tax_rate: tax, name: item.product.name, quantity: 1 }
+    { order_item_id: item.id, total_price_after_discount_before_tax: price * quantity, total_actual_price_before_tax: price * quantity, tax_rate: tax, name: item.product.name, quantity: quantity }
   end
 
   def product_deals_map(order_items, order)

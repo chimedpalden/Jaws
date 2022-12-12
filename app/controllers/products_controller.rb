@@ -9,6 +9,7 @@ class ProductsController < ApplicationController
 
   def create
     product = Product.new(product_params)
+    # product.deals.build(discounted_menu_item_id: , discount_percentage:)
     # binding.break
     product.save!
     render status: :ok, json: {notice: 'Product was successfully created'}

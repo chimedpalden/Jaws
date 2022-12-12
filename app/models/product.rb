@@ -5,5 +5,5 @@ class Product < ApplicationRecord
   has_many :deals
   has_many :order_items
   has_many :orders, through: :order_items
-  accepts_nested_attributes_for :deals
+  accepts_nested_attributes_for :deals, allow_destroy: true, reject_if: :all_blank
 end
