@@ -1,44 +1,43 @@
 import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
-// import { CartProvider, useCart } from "react-use-cart";
 import orderApi from "apis/order";
 import { getFromLocalStorage, setToLocalStorage } from "utils/storage";
 
 
 const Checkout = () => {
-  const init = [{
-    name: 'xxx',
-    price: 450,
-    quantity: 3
-  }]
-  const [products, setProducts] = useState(init);
-  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const currentOrder = getFromLocalStorage("currentOrder");
   
   // const [bill, setBill] = useState(product.price);
 
-  
-
   useEffect(() => {
     fetchCart();
-  }, []);
+  }, [loading]);
 
   const fetchCart = async () => {
-    // console.log(currentOrder)
-    if (currentOrder) {
-      try {
-        const { data } = await orderApi.cart(currentOrder);
-        setProducts(data);
-        console.log(data);
-        console.log(products)
-        setLoading(false);
-      } catch (error) {
-        console.log(error)
-        logger.error(error);
-        setLoading(false);
-      }
+    try {
+      const { data } = await orderApi.cart(currentOrder);
+      setProducts(data)
+      console.log(data)
+      console.log(products)
+      setLoading(false);
+    } catch (error) {
+      logger.error(error);
+      setLoading(false);
     }
-  }
+  };
+
+  const orderNow = async () => {
+    setLoading(true);
+    try {
+      const response = await orderApi.update(currentOrder);
+
+      setLoading(false);
+    } catch (error) {
+      logger.error(error);
+      setLoading(false);
+    }
+  };
 
 
   return (
@@ -56,45 +55,46 @@ const Checkout = () => {
                   <span class="lg:hidden" title="Quantity">Qtd</span>
                   <span class="hidden lg:inline">Quantity</span>
                 </th>
-                <th class="hidden text-right md:table-cell">Unit price</th>
-                <th class="text-right">Total price</th>
+                <th class="hidden text-right md:table-cell">Total Price</th>
+                <th class="text-right">Total price after discount</th>
+                <th class="text-right">Total tax</th>
               </tr>
             </thead>
             <tbody>
               {products.map(product => {
-                <tr>
-                  <td class="hidden pb-4 md:table-cell">
-                  </td>
-                  <td>
-                  {product.name}
-                    <a href="#">
-                      <p class="mb-2 md:ml-4">{product.name}</p>
-                      <form action="" method="POST">
-                        <button type="submit" class="text-gray-700 md:ml-4">
-                          <small>(Remove item)</small>
-                        </button>
-                      </form>
-                    </a>
-                  </td>
-                  <td class="justify-center md:justify-end md:flex mt-6">
-                    <div class="w-20 h-10">
-                      <div class="relative flex flex-row w-full h-8">
-                      <input type="number" value="2" 
-                        class="w-full font-semibold text-center text-gray-700 bg-gray-200 outline-none focus:outline-none hover:text-black focus:text-black" />
+                return(
+                  <tr>
+                    <td class="hidden pb-4 md:table-cell">
+                    </td>
+                    <td>
+                      <a href="#">
+                        <p class="mb-2 md:ml-4">{product.name}</p>
+                      </a>
+                    </td>
+                    <td class="justify-center md:justify-end md:flex mt-6">
+                      <div class="w-20 h-10">
+                        <div class="relative flex flex-row w-full h-8">
+                          {product.quantity}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td class="hidden text-right md:table-cell">
-                    <span class="text-sm lg:text-base font-medium">
-                      {product.price} $
-                    </span>
-                  </td>
-                  <td class="text-right">
-                    <span class="text-sm lg:text-base font-medium">
-                      {product.price * product.quantity} $
-                    </span>
-                  </td>
-                </tr> 
+                    </td>
+                    <td class="hidden text-right md:table-cell">
+                      <span class="text-sm lg:text-base font-medium">
+                        {product.total_actual_price_before_tax} $
+                      </span>
+                    </td>
+                    <td class="text-right">
+                      <span class="text-sm lg:text-base font-medium">
+                        {product.total_price_after_discount_before_tax} $
+                      </span>
+                    </td>
+                    <td class="text-right">
+                      <span class="text-sm lg:text-base font-medium">
+                        {(product.tax_rate * product.total_price_after_discount_before_tax)/100} $
+                      </span>
+                    </td>
+                  </tr> 
+                  )
               })}
                 
             </tbody>
@@ -111,55 +111,45 @@ const Checkout = () => {
               <div class="p-4">
                 <div class="flex justify-between border-b">
                   <div class="lg:px-4 lg:py-2 m-2 text-lg lg:text-xl font-bold text-center text-gray-800">
-                    Subtotal
+                    Total Bill before tax
+                    
                   </div>
                   <div class="lg:px-4 lg:py-2 m-2 lg:text-lg font-bold text-center text-gray-900">
-                    148,827.53€
+                    {products.reduce((acc, product) => {return acc + product.total_price_after_discount_before_tax }, 0)}
                   </div>
                 </div>
-                  <div class="flex justify-between pt-4 border-b">
-                    <div class="flex lg:px-4 lg:py-2 m-2 text-lg lg:text-xl font-bold text-gray-800">
-                      <form action="" method="POST">
-                        <button type="submit" class="mr-2 mt-1 lg:mt-2">
-                          <svg aria-hidden="true" data-prefix="far" data-icon="trash-alt" class="w-4 text-red-600 hover:text-red-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M268 416h24a12 12 0 0012-12V188a12 12 0 00-12-12h-24a12 12 0 00-12 12v216a12 12 0 0012 12zM432 80h-82.41l-34-56.7A48 48 0 00274.41 0H173.59a48 48 0 00-41.16 23.3L98.41 80H16A16 16 0 000 96v16a16 16 0 0016 16h16v336a48 48 0 0048 48h288a48 48 0 0048-48V128h16a16 16 0 0016-16V96a16 16 0 00-16-16zM171.84 50.91A6 6 0 01177 48h94a6 6 0 015.15 2.91L293.61 80H154.39zM368 464H80V128h288zm-212-48h24a12 12 0 0012-12V188a12 12 0 00-12-12h-24a12 12 0 00-12 12v216a12 12 0 0012 12z"/></svg>
-                        </button>
-                      </form>
-                      Coupon "90off"
-                    </div>
-                    <div class="lg:px-4 lg:py-2 m-2 lg:text-lg font-bold text-center text-green-700">
-                      -133,944.77€
-                    </div>
+                <div class="flex justify-between pt-4 border-b">
+                  <div class="lg:px-4 lg:py-2 m-2 text-lg lg:text-xl font-bold text-center text-gray-800">
+                    Total tax
                   </div>
-                  <div class="flex justify-between pt-4 border-b">
-                    <div class="lg:px-4 lg:py-2 m-2 text-lg lg:text-xl font-bold text-center text-gray-800">
-                      New Subtotal
-                    </div>
-                    <div class="lg:px-4 lg:py-2 m-2 lg:text-lg font-bold text-center text-gray-900">
-                      14,882.75€
-                    </div>
+                  <div class="lg:px-4 lg:py-2 m-2 lg:text-lg font-bold text-center text-gray-900">
+                    {products.reduce((acc, product) => {
+                      return acc + ((product.tax_rate * product.total_price_after_discount_before_tax)/100) }, 0)
+                    }
                   </div>
-                  <div class="flex justify-between pt-4 border-b">
-                    <div class="lg:px-4 lg:py-2 m-2 text-lg lg:text-xl font-bold text-center text-gray-800">
-                      Tax
-                    </div>
-                    <div class="lg:px-4 lg:py-2 m-2 lg:text-lg font-bold text-center text-gray-900">
-                      2,976.55€
-                    </div>
+                </div>
+                <div class="flex justify-between pt-4 border-b">
+                  <div class="lg:px-4 lg:py-2 m-2 text-lg lg:text-xl font-bold text-center text-gray-800">
+                    Net Payable
                   </div>
-                  <div class="flex justify-between pt-4 border-b">
-                    <div class="lg:px-4 lg:py-2 m-2 text-lg lg:text-xl font-bold text-center text-gray-800">
-                      Total
-                    </div>
-                    <div class="lg:px-4 lg:py-2 m-2 lg:text-lg font-bold text-center text-gray-900">
-                      17,859.3€
-                    </div>
+                  <div class="lg:px-4 lg:py-2 m-2 lg:text-lg font-bold text-center text-gray-900">
+                    {
+                      products.reduce((acc, product) => {return acc + product.total_price_after_discount_before_tax }, 0)
+                      +
+                      products.reduce((acc, product) => {
+                      return acc + ((product.tax_rate * product.total_price_after_discount_before_tax)/100) }, 0)
+                    }
                   </div>
-                <a href="#">
-                  <button class="flex justify-center w-full px-10 py-3 mt-6 font-medium text-white uppercase bg-gray-800 rounded-full shadow item-center hover:bg-gray-700 focus:shadow-outline focus:outline-none">
-                    <svg aria-hidden="true" data-prefix="far" data-icon="credit-card" class="w-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M527.9 32H48.1C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48.1 48h479.8c26.6 0 48.1-21.5 48.1-48V80c0-26.5-21.5-48-48.1-48zM54.1 80h467.8c3.3 0 6 2.7 6 6v42H48.1V86c0-3.3 2.7-6 6-6zm467.8 352H54.1c-3.3 0-6-2.7-6-6V256h479.8v170c0 3.3-2.7 6-6 6zM192 332v40c0 6.6-5.4 12-12 12h-72c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h72c6.6 0 12 5.4 12 12zm192 0v40c0 6.6-5.4 12-12 12H236c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h136c6.6 0 12 5.4 12 12z"/></svg>
-                    <span class="ml-2 mt-5px">Procceed to checkout</span>
-                  </button>
-                </a>
+                </div>
+                <button 
+                  onClick={() => orderNow()}
+                  class="flex justify-center w-full px-10 py-3 mt-6 font-medium text-white uppercase bg-gray-800 rounded-full shadow item-center hover:bg-gray-700 focus:shadow-outline focus:outline-none"
+                >
+                  <svg aria-hidden="true" data-prefix="far" data-icon="credit-card" class="w-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M527.9 32H48.1C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48.1 48h479.8c26.6 0 48.1-21.5 48.1-48V80c0-26.5-21.5-48-48.1-48zM54.1 80h467.8c3.3 0 6 2.7 6 6v42H48.1V86c0-3.3 2.7-6 6-6zm467.8 352H54.1c-3.3 0-6-2.7-6-6V256h479.8v170c0 3.3-2.7 6-6 6zM192 332v40c0 6.6-5.4 12-12 12h-72c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h72c6.6 0 12 5.4 12 12zm192 0v40c0 6.6-5.4 12-12 12H236c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h136c6.6 0 12 5.4 12 12z"/></svg>
+                  <span class="ml-2 mt-5px">
+                    {loading ? "loading..." : "Order Now"}
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -170,5 +160,5 @@ const Checkout = () => {
   );
 }
 
-export { Checkout };
+export default Checkout ;
 

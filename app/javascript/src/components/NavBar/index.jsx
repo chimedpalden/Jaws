@@ -59,6 +59,7 @@ const NavBar = () => {
             </div>
           </div>
           <div className="flex items-center justify-end gap-x-4">
+            <NavItem name="Message" path="/messages" />
             <NavItem name="Cart" path="/cart" />
             <span
               className="inline-flex items-center px-2 pt-1 text-sm font-regular leading-5 text-bb-gray-600

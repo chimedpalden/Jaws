@@ -9,8 +9,9 @@ import { getFromLocalStorage } from "utils/storage";
 import Dashboard from "components/Dashboard";
 import CreateProduct from "components/Menu/Create";
 import NavBar from "components/NavBar"
-import { Checkout } from "components/Cart/Checkout"
+import Checkout from "components/Cart/Checkout"
 import { Login, Signup } from "components/Authentication";
+import Message from "components/Message";
 import PrivateRoute from "components/Common/PrivateRoute";
 
 const App = () => {
@@ -39,6 +40,7 @@ const App = () => {
         <Route exact path="/signup" component={Signup} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/cart" component={Checkout} />
+        <Route exact path="/messages" component={Message} />
         <PrivateRoute
           path="/"
           redirectRoute="/login"

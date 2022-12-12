@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   has_secure_password
   has_secure_token :authentication_token
+  has_many :user_notifications, dependent: :destroy, foreign_key: :user_id
 
   validates :username, presence: true, length: { maximum: 35 }
   validates :email, presence: true,

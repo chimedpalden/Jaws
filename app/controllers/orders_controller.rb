@@ -7,7 +7,7 @@ class OrdersController < ApplicationController
     ActiveRecord::Base.transaction do
       if current_user.current_order.nil? 
         @order = current_user.orders.create!(order_params)
-        current_user.update_attribute(:current_order, order.id)
+        current_user.update_attribute(:current_order, @order.id)
       else
         @order = Order.find(current_user.current_order)
       end
@@ -21,6 +21,16 @@ class OrdersController < ApplicationController
       end
       @order.save!
     end
+  end
+
+  def update
+    # binding.break
+    @order = Order.find(params[:id])
+    @order.update_attribute(:status, 1)
+    UserNotificationsWorker.perform_at(10.seconds.from_now, params[:id], current_user.email, current_user.authentication_token)
+    @order.update_attribute(:status, 2)
+    current_user.update_attribute(:current_order, nil)
+    render status: :ok, json: {notice: 'Order completed'}
   end
 
   def show

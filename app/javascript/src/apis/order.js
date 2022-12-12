@@ -11,10 +11,14 @@ const show = id =>
 const cart = id =>
   axios.get(`/orders/${id}`);
 
+const update = id =>
+  axios.put(`/orders/${id}`)
+
 const orderApi = {
   show,
   create,
   cart,
+  update
 };
 
 export default orderApi;

@@ -45,7 +45,8 @@ gem "webpacker"
 gem "responders"
 gem 'react-rails'
 gem 'bcrypt', '~> 3.1.13'
-
+gem "sidekiq-cron"
+gem 'rest-client', '~> 2.1.0'
 
 # Use Sass to process CSS
 # gem "sassc-rails"

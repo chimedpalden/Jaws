@@ -47,13 +47,13 @@ module Billing
       value.each do |x|
         next if flag[x[:order_item_id]] == 1 && key != x[:order_item_id]
         discounted_quantity = (x[:quantity] > order_item.quantity) ? order_item.quantity : x[:quantity]
-        non_discounted_quantity = (x[:quantity] > order_item.quantity) ? (quantity - order_item.quantity) : 0
+        non_discounted_quantity = (x[:quantity] > order_item.quantity) ? (x[:quantity] - order_item.quantity) : 0
 
         discount_price = (discounted_quantity * x[:price]) * (100 - x[:discount_percentage])/100
         non_discount_price = (non_discounted_quantity * x[:price]) * (100 - x[:discount_percentage])/100
         total_price = discount_price + non_discount_price
 
-        data = { order_item_id: x[:order_item_id], total_price_before_tax: total_price, total_actual_price_before_tax: (x[:quantity] * x[:price]), tax_rate: x[:tax_rate], name: x[:name], quantity: x[:quantity] }
+        data = { order_item_id: x[:order_item_id], total_price_after_discount_before_tax: total_price, total_actual_price_before_tax: (x[:quantity] * x[:price]), tax_rate: x[:tax_rate], name: x[:name], quantity: x[:quantity] }
         price_map_per_item.push(data)
         flag[x[:order_item_id]] = 1
       end
@@ -72,7 +72,7 @@ module Billing
     price = item.product.price
     tax = item.product.tax_rate
 
-    { order_item_id: item.id, total_price_before_tax: price, total_actual_price_before_tax: price, tax_rate: tax, name: item.product.name, quantity: 1 }
+    { order_item_id: item.id, total_price_after_discount_before_tax: price, total_actual_price_before_tax: price, tax_rate: tax, name: item.product.name, quantity: 1 }
   end
 
   def product_deals_map(order_items, order)
